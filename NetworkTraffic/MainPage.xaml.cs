@@ -26,5 +26,24 @@ namespace NetworkTraffic
         {
             this.InitializeComponent();
         }
+
+        protected async override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
+
+            // https://social.msdn.microsoft.com/Forums/ja-JP/27d3fdba-d433-4b6b-b370-f58cf41381ea?forum=winstoreapp
+
+            var states = new Windows.Networking.Connectivity.NetworkUsageStates();
+
+            var since = DateTime.Now - TimeSpan.FromMinutes(30);
+            var until = DateTime.Now;
+
+            var profile = Windows.Networking.Connectivity.NetworkInformation.GetInternetConnectionProfile();
+            var list = await profile.GetNetworkUsageAsync(since, until, Windows.Networking.Connectivity.DataUsageGranularity.PerMinute, states);
+            for (var i = 0; i < list.Count; i++)
+            {
+                System.Diagnostics.Debug.WriteLine(i + string.Format(". Sent: {0:#,0}bytes, Received: {1:#,0}bytes." + Environment.NewLine, list[i].BytesSent, list[i].BytesReceived));
+            }
+        }
     }
 }
